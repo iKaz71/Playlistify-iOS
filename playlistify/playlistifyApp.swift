@@ -15,6 +15,7 @@ struct playlistifyApp: App {
     @State private var splashOpacity = 1.0
 
     init() {
+        UIView.appearance().overrideUserInterfaceStyle = .dark
         FirebaseApp.configure()
     }
 

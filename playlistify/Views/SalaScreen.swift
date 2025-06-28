@@ -18,23 +18,24 @@ enum SalaAction: Identifiable, Equatable {
         }
     }
 }
+
 struct SalaScreen: View {
     let sessionId: String
     let onSalirSala: () -> Void
     @ObservedObject var googleSignInManager: GoogleSignInManager
+    @ObservedObject var networkMonitor = NetworkMonitor()
+    @State private var showMobileAlert = false
+
 
     // --- Estados ---
-    
     @State private var mostrarSalirSalaSheet = false
     @State private var mostrarCerrarSesionSheet = false
-
     @State private var cancionesDict: [String: Cancion] = [:]
     @State private var ordenCanciones: [String] = []
     @State private var cancionActual: Cancion? = nil
     @State private var isLoading = true
     @State private var mostrarBuscador = false
     @State private var salaAction: SalaAction? = nil
-
     @State private var mostrarScannerQR = false
     @State private var showMenuSheet = false
     @State private var showNombreSheet = false
@@ -54,9 +55,8 @@ struct SalaScreen: View {
 
     @State private var emailUsuario: String = UserDefaults.standard.string(forKey: "emailUsuario") ?? ""
     @State private var rolUsuario: String = UserDefaults.standard.string(forKey: "rolUsuario") ?? "Invitado"
-
-    
     @State private var showSalirSalaAlert = false
+
     // Buscador
     @State private var query = ""
     @State private var resultados: [YouTubeVideoItem] = []
@@ -65,6 +65,7 @@ struct SalaScreen: View {
     @State private var codigoSesion: String = ""
     let rojoVivo = Color(red: 1, green: 0.2, blue: 0.3)
     let fondoOscuro = Color(red: 28/255, green: 28/255, blue: 30/255)
+
     var body: some View {
         ZStack {
             fondoOscuro.ignoresSafeArea()
@@ -75,6 +76,22 @@ struct SalaScreen: View {
                 Spacer(minLength: 8)
             }
         }
+        // ----------- BANNER RED -------------
+        .overlay(
+            VStack(spacing: 0) {
+                if !networkMonitor.isConnected {
+                    BannerView(text: "Sin conexión a Internet", color: .red)
+                        .frame(height: 44)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+                Spacer()
+            }
+            .animation(.easeInOut, value: networkMonitor.isConnected)
+        , alignment: .top)
+        
+
+
+        // --------- SHEETS y ALERTS debajo del overlay, como siempre -------------
         .sheet(isPresented: $mostrarBuscador) {
             BusquedaYT(
                 query: $query,
@@ -85,8 +102,8 @@ struct SalaScreen: View {
                 rojoVivo: rojoVivo,
                 fondoOscuro: fondoOscuro,
                 sessionId: sessionId,
-                agregarCancion: agregarCancion, // asegúrate de que tu función siga este signature
-                buscarCanciones: buscarCanciones // igual, recibe (String, ([YouTubeVideoItem]) -> Void)
+                agregarCancion: agregarCancion,
+                buscarCanciones: buscarCanciones
             )
         }
         .sheet(isPresented: $showMenuSheet) {
@@ -100,15 +117,13 @@ struct SalaScreen: View {
                 mostrarScannerQR = false
             }
         }
-
         .sheet(isPresented: $showNombreSheet) {
             CambiarNombreDialog(
                 isPresented: $showNombreSheet,
                 nombreUsuario: $nombreUsuario,
-                sessionId: sessionId // pásalo aquí
+                sessionId: sessionId
             )
         }
-
         .sheet(isPresented: $mostrarSalirSalaSheet) {
             ConfirmarSalirSalaSheet(
                 onConfirmar: {
@@ -128,7 +143,6 @@ struct SalaScreen: View {
                     googleSignInManager.signOut()
                     emailUsuario = ""
                     UserDefaults.standard.set("", forKey: "emailUsuario")
-                    // No cambies rolUsuario aquí.
                 },
                 onCancelar: {
                     mostrarCerrarSesionSheet = false
@@ -136,7 +150,6 @@ struct SalaScreen: View {
             )
             .presentationDetents([.fraction(0.22)])
         }
-
         .alert(item: $salaAction) { action in
             switch action {
             case .eliminar(let pushKey, let cancion):
@@ -188,15 +201,12 @@ struct SalaScreen: View {
                     UserDefaults.standard.set(nombreUsuario, forKey: "nombreUsuario")
                 }
                 emailUsuario = googleUser.profile?.email ?? ""
-                UserDefaults.standard.set(emailUsuario, forKey: "emailUsuario") 
+                UserDefaults.standard.set(emailUsuario, forKey: "emailUsuario")
             } else {
                 emailUsuario = ""
                 UserDefaults.standard.set("", forKey: "emailUsuario")
             }
         }
-
-
-
         .onAppear {
             escucharColaYOrden()
             FirebaseQueueManager.shared.escucharPlayback(sessionId: sessionId) { actual in
@@ -207,6 +217,7 @@ struct SalaScreen: View {
             }
         }
     }
+
 
     // --------- Alertas ---------
     var salirSalaAlert: Alert {

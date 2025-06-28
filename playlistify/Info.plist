@@ -29,6 +29,9 @@
     <array>
         <integer>1</integer>
     </array>
+    <!-- Dark MODE v: -->
+        <key>UIUserInterfaceStyle</key>
+        <string>Dark</string>
 
     <!-- CLAVES PERSONALIZADAS -->
     <key>NSCameraUsageDescription</key>
