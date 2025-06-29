@@ -88,8 +88,6 @@ struct SalaScreen: View {
             }
             .animation(.easeInOut, value: networkMonitor.isConnected)
         , alignment: .top)
-        
-
 
         // --------- SHEETS y ALERTS debajo del overlay, como siempre -------------
         .sheet(isPresented: $mostrarBuscador) {
