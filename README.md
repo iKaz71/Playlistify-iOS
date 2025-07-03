@@ -151,7 +151,22 @@ El endpoint por default apunta a Railway.
 - **No iPad, solo orientación vertical.**
 - **Se recomienda probar en dispositivo físico.**
 
+--
+## 🔧 Backend/API
 
+El backend es un servidor **Node.js/Express + Firebase**.  
+La app TV conecta automáticamente con el endpoint de producción por default.
 
+- [Repositorio backend](https://github.com/iKaz71/playlistify-api)
 
 ---
+
+## 🚀 Ecosistema Playlistify
+
+- [Playlistify Android](https://github.com/iKaz71/Playlistify-Android)
+- [Playlistify iOS](https://github.com/iKaz71/Playlistify-iOS)
+- [TV Playlistify](https://github.com/iKaz71/TvPlaylistify)
+
+---
+
+
