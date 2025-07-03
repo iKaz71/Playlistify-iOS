@@ -44,6 +44,7 @@ El logo es un fantasma con una tornamesa o disco para mezclar, usando los colore
 ###2. Configura tu archivo de secretos
 
 - Agrega tus claves de YouTube, Firebase y Google Sign-In.
+- ⚠️ No olvides colocar GoogleService-info.plist en la raiz
 - **No compartas ni subas tus claves reales al repo.**
 
 ###3. Instala las dependencias
