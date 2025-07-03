@@ -341,7 +341,7 @@ struct SalaScreen: View {
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
-            .frame(maxHeight: 420)
+            
             .background(fondoOscuro)
             .cornerRadius(28)
         }
